@@ -114,6 +114,24 @@ a {
   color: var(--brand);
 }
 
+.menu-toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--ink);
+  font-size: 17px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.nav-backdrop {
+  display: none;
+}
+
 .nav {
   display: flex;
   align-items: center;
@@ -1069,16 +1087,101 @@ h1 {
 
 @media (max-width: 720px) {
   .page {
-    padding: 24px 18px 100px;
+    padding: 18px 16px 96px;
   }
   .listing-detail {
     grid-template-columns: 1fr;
     gap: 24px;
   }
   .header {
-    padding: 14px 18px;
+    padding: 12px 16px;
   }
+
+  .menu-toggle {
+    display: flex;
+  }
+
   .nav {
+    position: fixed;
+    top: 63px;
+    right: 16px;
+    left: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: 10px;
+    display: none;
+    z-index: 40;
+  }
+  .nav.open {
+    display: flex;
+  }
+  .nav a,
+  .nav .link-btn,
+  .nav .user-name {
+    padding: 11px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+  }
+  .nav a:hover {
+    background: var(--surface-alt);
+  }
+  .nav .btn-primary-small {
+    text-align: center;
+  }
+  .nav .theme-toggle {
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+
+  .nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 35;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .search-box {
+    padding: 12px 16px;
+  }
+
+  .listing-grid {
+    grid-template-columns: repeat(2, 1fr);
     gap: 14px;
+  }
+
+  .fab {
+    bottom: 20px;
+    right: 20px;
+    width: 52px;
+    height: 52px;
+    font-size: 24px;
+  }
+
+  .modal-actions .btn-primary,
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .owner-actions,
+  .order-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .chat-thread {
+    height: calc(100vh - 170px);
   }
 }

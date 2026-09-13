@@ -84,13 +84,10 @@ const categoryTree = [
   },
 ];
 
-// Picsum is a fast, reliable CDN of stock photography — deterministic per
-// seed string, so the same listing always gets the same photo. Not
-// content-aware (no keyword search), but that trades a little relevance for
-// much better reliability than keyword-search services.
-function photo(seed) {
-  return `https://picsum.photos/seed/${seed}/600/450`;
-}
+// No stock photo service is used here: a random/keyword-matched photo (as
+// tried before) frequently didn't match the actual listing, which looks
+// worse than no photo at all. Listings fall back to the category-emoji
+// gradient placeholder (see ListingCard.jsx), which always matches.
 
 const sellers = [
   {
@@ -118,7 +115,6 @@ const listings = [
     city: 'Tashkent',
     category: 'phones',
     seller: 'demo',
-    image: photo('iphone'),
   },
   {
     title: 'Samsung Galaxy S24 Ultra, 512GB',
@@ -127,7 +123,6 @@ const listings = [
     city: 'Tashkent',
     category: 'phones',
     seller: 'aziz',
-    image: photo('smartphone'),
   },
   {
     title: 'Apple MacBook Air M2, 2023',
@@ -136,7 +131,6 @@ const listings = [
     city: 'Samarkand',
     category: 'computers',
     seller: 'aziz',
-    image: photo('macbook'),
   },
   // Vehicles
   {
@@ -146,7 +140,6 @@ const listings = [
     city: 'Samarkand',
     category: 'cars',
     seller: 'demo',
-    image: photo('sedan-car'),
   },
   {
     title: 'Chevrolet Lacetti 2019, gaz-benzin',
@@ -155,7 +148,6 @@ const listings = [
     city: 'Fergana',
     category: 'cars',
     seller: 'demo',
-    image: photo('hatchback-car'),
   },
   {
     title: 'Yamaha YBR 125 mototsikl',
@@ -164,7 +156,6 @@ const listings = [
     city: 'Andijan',
     category: 'motorcycles',
     seller: 'aziz',
-    image: photo('motorcycle'),
   },
   // Real estate
   {
@@ -174,7 +165,6 @@ const listings = [
     city: 'Tashkent',
     category: 'apartments',
     seller: 'demo',
-    image: photo('apartment-interior'),
   },
   {
     title: 'Hovli uy, 6 sotix',
@@ -183,7 +173,6 @@ const listings = [
     city: 'Samarkand',
     category: 'houses',
     seller: 'aziz',
-    image: photo('house-exterior'),
   },
   // Home & garden
   {
@@ -193,7 +182,6 @@ const listings = [
     city: 'Bukhara',
     category: 'furniture',
     seller: 'demo',
-    image: photo('sofa'),
   },
   {
     title: 'Oshxona garniturasi, MDF',
@@ -202,7 +190,6 @@ const listings = [
     city: 'Namangan',
     category: 'kitchenware',
     seller: 'aziz',
-    image: photo('kitchen-cabinet'),
   },
   // Fashion
   {
@@ -212,7 +199,6 @@ const listings = [
     city: 'Tashkent',
     category: 'menswear',
     seller: 'demo',
-    image: photo('mens-suit'),
   },
   {
     title: "Ayollar qishki kurtkasi, XL",
@@ -221,7 +207,6 @@ const listings = [
     city: 'Fergana',
     category: 'womenswear',
     seller: 'aziz',
-    image: photo('winter-jacket'),
   },
   // Jobs
   {
@@ -231,7 +216,6 @@ const listings = [
     city: 'Tashkent',
     category: 'it-jobs',
     seller: 'demo',
-    image: photo('office-work'),
   },
   {
     title: "Haydovchi (B toifa) talab qilinadi",
@@ -240,7 +224,6 @@ const listings = [
     city: 'Nukus',
     category: 'driver-jobs',
     seller: 'aziz',
-    image: photo('delivery-driver'),
   },
   // Services
   {
@@ -250,7 +233,6 @@ const listings = [
     city: 'Tashkent',
     category: 'repair-services',
     seller: 'demo',
-    image: photo('home-renovation'),
   },
   {
     title: "Kompyuter va noutbuk ta'mirlash",
@@ -259,7 +241,6 @@ const listings = [
     city: 'Bukhara',
     category: 'repair-services',
     seller: 'aziz',
-    image: photo('computer-repair'),
   },
   // Kids
   {
@@ -269,7 +250,6 @@ const listings = [
     city: 'Andijan',
     category: 'bicycles',
     seller: 'demo',
-    image: photo('kids-bicycle'),
   },
   {
     title: "O'yinchoqlar to'plami, 3-6 yosh",
@@ -278,7 +258,158 @@ const listings = [
     city: 'Namangan',
     category: 'toys',
     seller: 'aziz',
-    image: photo('kids-toys'),
+  },
+  // More electronics
+  {
+    title: 'Canon EOS 2000D fotoapparat, linza bilan',
+    description: "18-55mm linza komplekti bilan, sumka va xotira kartasi qo'shiladi.",
+    price: 4200000,
+    city: 'Tashkent',
+    category: 'photo-video',
+    seller: 'demo',
+  },
+  {
+    title: "Samsung 55\" Smart TV, 4K UHD",
+    description: "2023 yil chiqarilgan, deyarli yangi, devor kronshteyni bilan.",
+    price: 6800000,
+    city: 'Samarkand',
+    category: 'tv-video',
+    seller: 'aziz',
+  },
+  {
+    title: 'JBL Charge 5 bluetooth kolonka',
+    description: "Suv o'tkazmaydi, 20 soatgacha batareya quvvati.",
+    price: 1450000,
+    city: 'Tashkent',
+    category: 'audio',
+    seller: 'demo',
+  },
+  // More vehicles
+  {
+    title: 'Isuzu yuk mashinasi, 5 tonna',
+    description: "2018 yil, texnik holati yaxshi, muntazam texnik xizmat ko'rsatilgan.",
+    price: 210000000,
+    city: 'Fergana',
+    category: 'trucks',
+    seller: 'aziz',
+  },
+  {
+    title: 'Original dvigatel yog\' filtri to\'plami',
+    description: "Toyota va Lexus modellariga mos, original ehtiyot qism.",
+    price: 180000,
+    city: 'Tashkent',
+    category: 'auto-parts',
+    seller: 'demo',
+  },
+  // More real estate
+  {
+    title: "8 sotix yer uchastkasi, qurilishga tayyor",
+    description: "Barcha hujjatlar tayyor, kommunikatsiyalar yaqin.",
+    price: 320000000,
+    city: 'Samarkand',
+    category: 'land',
+    seller: 'demo',
+  },
+  {
+    title: 'Ofis xonasi ijaraga, 45 m²',
+    description: "Biznes markazda, alohida kirish, parking mavjud. Oylik ijara.",
+    price: 9000000,
+    city: 'Tashkent',
+    category: 'commercial',
+    seller: 'aziz',
+  },
+  // More home & garden
+  {
+    title: "Bog' uchun avtomatik sug'orish tizimi",
+    description: "O'rnatish bilan birga, 100 m² gacha maydonga yetadi.",
+    price: 2300000,
+    city: 'Fergana',
+    category: 'garden',
+    seller: 'demo',
+  },
+  {
+    title: 'Devor uchun modulli rasmlar to\'plami',
+    description: "5 dona, zamonaviy dizayn, osish uchun barcha detallar bilan.",
+    price: 480000,
+    city: 'Bukhara',
+    category: 'decor',
+    seller: 'aziz',
+  },
+  // More fashion
+  {
+    title: 'Nike Air Max krossovkalari, 42-razmer',
+    description: "Original, faqat 2 marta kiyilgan, quti bilan.",
+    price: 890000,
+    city: 'Tashkent',
+    category: 'shoes',
+    seller: 'demo',
+  },
+  {
+    title: "Charm hamyon va kamar to'plami",
+    description: "Erkaklar uchun, tabiiy charmdan, sovg'a qutisida.",
+    price: 320000,
+    city: 'Andijan',
+    category: 'accessories',
+    seller: 'aziz',
+  },
+  // More jobs
+  {
+    title: "Sotuv menejeri talab qilinadi",
+    description: "Tajriba shart emas, o'qitish beriladi. Oylik + foiz.",
+    price: 5500000,
+    city: 'Tashkent',
+    category: 'sales-jobs',
+    seller: 'demo',
+  },
+  {
+    title: "Bo'yoqchi va shpaklovchi ustalar kerak",
+    description: "Doimiy ish, tajribali ustalar ustunlik oladi.",
+    price: 6000000,
+    city: 'Namangan',
+    category: 'construction-jobs',
+    seller: 'aziz',
+  },
+  // More services
+  {
+    title: "Uyga chaqiriladigan bewitching va manikyur xizmati",
+    description: "Professional usta, barcha kerakli asboblar bilan keladi.",
+    price: 200000,
+    city: 'Tashkent',
+    category: 'beauty-services',
+    seller: 'demo',
+  },
+  {
+    title: "Ingliz tili individual darslari",
+    description: "Online yoki offline, barcha darajalar uchun, IELTS tayyorlov.",
+    price: 150000,
+    city: 'Samarkand',
+    category: 'education-services',
+    seller: 'aziz',
+  },
+  {
+    title: "Yuk tashish xizmati, shahar bo'ylab",
+    description: "Gazel avtomobil, yuk ortish-tushirish xizmati bilan.",
+    price: 250000,
+    city: 'Tashkent',
+    category: 'transport-services',
+    seller: 'demo',
+  },
+  // More kids
+  {
+    title: "Qizlar uchun bahorgi kiyimlar to'plami, 4-5 yosh",
+    description: "5 dona, sifatli mato, deyarli kiyilmagan.",
+    price: 280000,
+    city: 'Fergana',
+    category: 'kids-clothing',
+    seller: 'aziz',
+  },
+  {
+    title: "Maktab uchun ryukzak va kanselyariya to'plami",
+    description: "Ortopedik ryukzak + daftar, ruchka va boshqa kerakli buyumlar.",
+    price: 340000,
+    city: 'Andijan',
+    category: 'school-supplies',
+    seller: 'demo',
   },
 ];
 
@@ -332,7 +463,6 @@ async function main() {
         city: l.city,
         categoryId,
         sellerId: sellerByKey[l.seller].id,
-        imageUrl: l.image,
       },
     });
   }
