@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  name          String
+  email         String    @unique
+  phone         String?
+  password      String
+  city          String?
+  createdAt     DateTime  @default(now())
+  listings      Listing[]
+  ordersBought  Order[]   @relation("BuyerOrders")
+  ordersSold    Order[]   @relation("SellerOrders")
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  nameUz   String
+  slug     String    @unique
+  listings Listing[]
+}
+
+model Listing {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  price       Float
+  currency    String   @default("UZS")
+  city        String
+  imageUrl    String?
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  seller     User     @relation(fields: [sellerId], references: [id])
+  sellerId   Int
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  orders     Order[]
+}
+
+// Escrow flow: PENDING_PAYMENT -> PAID_ESCROW -> SHIPPED -> RELEASED
+// A buyer can DISPUTE from PAID_ESCROW or SHIPPED; a dispute is resolved
+// manually (REFUNDED back to buyer or RELEASED to seller) by an admin/support
+// process outside this MVP.
+model Order {
+  id          Int      @id @default(autoincrement())
+  status      String   @default("PENDING_PAYMENT")
+  amount      Float
+  currency    String   @default("UZS")
+  createdAt   DateTime @default(now())
+  paidAt      DateTime?
+  shippedAt   DateTime?
+  releasedAt  DateTime?
+
+  listing    Listing @relation(fields: [listingId], references: [id])
+  listingId  Int
+  buyer      User    @relation("BuyerOrders", fields: [buyerId], references: [id])
+  buyerId    Int
+  seller     User    @relation("SellerOrders", fields: [sellerId], references: [id])
+  sellerId   Int
+}
