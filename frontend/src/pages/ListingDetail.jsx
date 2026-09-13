@@ -21,6 +21,7 @@ export default function ListingDetail() {
   const [listing, setListing] = useState(null);
   const [error, setError] = useState('');
   const [buying, setBuying] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
     api
@@ -54,12 +55,13 @@ export default function ListingDetail() {
   const isOwner = user && user.id === listing.sellerId;
   const thumbClass = `thumb-${listing.id % 6}`;
   const emoji = CATEGORY_EMOJI[listing.category?.slug] || '📦';
+  const showImage = listing.imageUrl && !imageFailed;
 
   return (
     <div className="page listing-detail">
-      <div className={`listing-detail-image ${listing.imageUrl ? '' : thumbClass}`}>
-        {listing.imageUrl ? (
-          <img src={listing.imageUrl} alt={listing.title} />
+      <div className={`listing-detail-image ${showImage ? '' : thumbClass}`}>
+        {showImage ? (
+          <img src={listing.imageUrl} alt={listing.title} onError={() => setImageFailed(true)} />
         ) : (
           <div className="listing-image-placeholder large">{emoji}</div>
         )}

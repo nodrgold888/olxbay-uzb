@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const CATEGORY_EMOJI = {
@@ -21,16 +22,18 @@ function formatPrice(price, currency) {
 }
 
 export default function ListingCard({ listing }) {
+  const [imageFailed, setImageFailed] = useState(false);
   const thumbClass = `thumb-${listing.id % 6}`;
   const emoji = CATEGORY_EMOJI[listing.category?.slug] || '📦';
   const badge = STATUS_BADGE[listing.status];
+  const showImage = listing.imageUrl && !imageFailed;
 
   return (
     <Link to={`/listing/${listing.id}`} className="listing-card">
-      <div className={`listing-image ${listing.imageUrl ? '' : thumbClass}`}>
+      <div className={`listing-image ${showImage ? '' : thumbClass}`}>
         {badge && <span className="listing-badge">{badge}</span>}
-        {listing.imageUrl ? (
-          <img src={listing.imageUrl} alt={listing.title} />
+        {showImage ? (
+          <img src={listing.imageUrl} alt={listing.title} onError={() => setImageFailed(true)} />
         ) : (
           <span className="listing-image-placeholder">{emoji}</span>
         )}

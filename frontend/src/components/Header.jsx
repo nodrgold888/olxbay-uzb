@@ -1,8 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   return (
@@ -36,6 +38,14 @@ export default function Header() {
             </Link>
           </>
         )}
+        <button
+          className="theme-toggle"
+          onClick={toggleTheme}
+          title={theme === 'dark' ? "Yorug' rejim" : "Qorong'i rejim"}
+          aria-label="Mavzuni almashtirish"
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
       </nav>
     </header>
   );

@@ -14,10 +14,12 @@ const categories = [
   { name: 'Kids', nameUz: 'Bolalar uchun', slug: 'kids' },
 ];
 
-// LoremFlickr serves a real (if random) photo per keyword — good enough for
-// demo listings without needing to source and store our own images.
-function photo(keyword) {
-  return `https://loremflickr.com/600/600/${keyword}`;
+// Picsum is a fast, reliable CDN of stock photography — deterministic per
+// seed string, so the same listing always gets the same photo. Not
+// content-aware (no keyword search), but that trades a little relevance for
+// much better reliability than keyword-search services.
+function photo(seed) {
+  return `https://picsum.photos/seed/${seed}/600/450`;
 }
 
 const sellers = [
