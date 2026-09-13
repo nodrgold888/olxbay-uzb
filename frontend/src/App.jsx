@@ -10,6 +10,8 @@ import OrderList from './pages/OrderList.jsx';
 import Checkout from './pages/Checkout.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+import ChatList from './pages/ChatList.jsx';
+import ChatThread from './pages/ChatThread.jsx';
 
 export default function App() {
   return (
@@ -66,6 +68,22 @@ export default function App() {
             element={
               <PrivateRoute>
                 <OrderList mode="selling" />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <PrivateRoute>
+                <ChatList />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/chat/:id"
+            element={
+              <PrivateRoute>
+                <ChatThread />
               </PrivateRoute>
             }
           />

@@ -22,7 +22,8 @@ export default function PostListing() {
   useEffect(() => {
     api.get('/categories').then((res) => {
       setCategories(res.data);
-      if (res.data.length) setForm((f) => ({ ...f, categoryId: res.data[0].id }));
+      const firstLeaf = res.data[0]?.children?.[0];
+      if (firstLeaf) setForm((f) => ({ ...f, categoryId: firstLeaf.id }));
     });
   }, []);
 
@@ -100,10 +101,14 @@ export default function PostListing() {
           <label>
             Kategoriya
             <select value={form.categoryId} onChange={(e) => update('categoryId', e.target.value)}>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nameUz}
-                </option>
+              {categories.map((top) => (
+                <optgroup key={top.id} label={top.nameUz}>
+                  {top.children.map((child) => (
+                    <option key={child.id} value={child.id}>
+                      {child.nameUz}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
           </label>

@@ -22,6 +22,7 @@ export default function ListingDetail() {
   const [error, setError] = useState('');
   const [buying, setBuying] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
+  const [messaging, setMessaging] = useState(false);
 
   useEffect(() => {
     api
@@ -49,12 +50,26 @@ export default function ListingDetail() {
     }
   }
 
+  async function handleMessageSeller() {
+    if (!user) return navigate('/login');
+    setMessaging(true);
+    try {
+      const res = await api.post('/conversations', { listingId: listing.id });
+      navigate(`/chat/${res.data.id}`);
+    } catch (err) {
+      alert(err.response?.data?.error || "Xabar yozishda xatolik yuz berdi");
+    } finally {
+      setMessaging(false);
+    }
+  }
+
   if (error) return <div className="page empty-state">{error}</div>;
   if (!listing) return <div className="page-loading">Yuklanmoqda...</div>;
 
   const isOwner = user && user.id === listing.sellerId;
   const thumbClass = `thumb-${listing.id % 6}`;
-  const emoji = CATEGORY_EMOJI[listing.category?.slug] || '📦';
+  const emoji =
+    CATEGORY_EMOJI[listing.category?.slug] || CATEGORY_EMOJI[listing.category?.parent?.slug] || '📦';
   const showImage = listing.imageUrl && !imageFailed;
 
   return (
@@ -72,12 +87,22 @@ export default function ListingDetail() {
           {Number(listing.price).toLocaleString('ru-RU')} {listing.currency}
         </div>
         <div className="listing-detail-meta">
-          {listing.city} · {listing.category?.nameUz}
+          {listing.city} ·{' '}
+          {listing.category?.parent ? `${listing.category.parent.nameUz} / ` : ''}
+          {listing.category?.nameUz}
         </div>
         <p className="listing-detail-description">{listing.description}</p>
         <div className="seller-box">
           <strong>Sotuvchi:</strong> {listing.seller?.name}
         </div>
+
+        {!isOwner && (
+          <div className="owner-actions">
+            <button className="btn-secondary" onClick={handleMessageSeller} disabled={messaging}>
+              💬 {messaging ? 'Ochilmoqda...' : 'Sotuvchiga yozish'}
+            </button>
+          </div>
+        )}
 
         {!isOwner && listing.status === 'active' && (
           <div className="escrow-box">

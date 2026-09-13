@@ -34,7 +34,19 @@ router.get('/', async (req, res) => {
       { description: { contains: String(q) } },
     ];
   }
-  if (categoryId) where.categoryId = Number(categoryId);
+  if (categoryId) {
+    // Selecting a top-level category should also match listings tagged to
+    // one of its subcategories; selecting a subcategory matches only that.
+    const category = await prisma.category.findUnique({
+      where: { id: Number(categoryId) },
+      include: { children: true },
+    });
+    if (category && category.children.length > 0) {
+      where.categoryId = { in: [category.id, ...category.children.map((c) => c.id)] };
+    } else {
+      where.categoryId = Number(categoryId);
+    }
+  }
   if (city) where.city = String(city);
   if (minPrice || maxPrice) {
     where.price = {};
@@ -48,7 +60,10 @@ router.get('/', async (req, res) => {
   const [listings, total] = await Promise.all([
     prisma.listing.findMany({
       where,
-      include: { category: true, seller: { select: { id: true, name: true, city: true } } },
+      include: {
+        category: { include: { parent: true } },
+        seller: { select: { id: true, name: true, city: true } },
+      },
       orderBy: { createdAt: 'desc' },
       take,
       skip,
@@ -62,7 +77,7 @@ router.get('/', async (req, res) => {
 router.get('/mine', auth, async (req, res) => {
   const listings = await prisma.listing.findMany({
     where: { sellerId: req.userId },
-    include: { category: true },
+    include: { category: { include: { parent: true } } },
     orderBy: { createdAt: 'desc' },
   });
   res.json(listings);
@@ -74,7 +89,10 @@ router.get('/mine', auth, async (req, res) => {
 router.get('/:id', async (req, res) => {
   const listing = await prisma.listing.findUnique({
     where: { id: Number(req.params.id) },
-    include: { category: true, seller: { select: { id: true, name: true, city: true } } },
+    include: {
+      category: { include: { parent: true } },
+      seller: { select: { id: true, name: true, city: true } },
+    },
   });
   if (!listing) return res.status(404).json({ error: 'Listing not found' });
   res.json(listing);

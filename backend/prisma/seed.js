@@ -3,15 +3,85 @@ const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
-const categories = [
-  { name: 'Electronics', nameUz: 'Elektronika', slug: 'electronics' },
-  { name: 'Vehicles', nameUz: 'Transport', slug: 'vehicles' },
-  { name: 'Real Estate', nameUz: 'Ko\'chmas mulk', slug: 'real-estate' },
-  { name: 'Home & Garden', nameUz: 'Uy va bog\'', slug: 'home-garden' },
-  { name: 'Fashion', nameUz: 'Kiyim-kechak', slug: 'fashion' },
-  { name: 'Jobs', nameUz: 'Ish o\'rinlari', slug: 'jobs' },
-  { name: 'Services', nameUz: 'Xizmatlar', slug: 'services' },
-  { name: 'Kids', nameUz: 'Bolalar uchun', slug: 'kids' },
+// Two-level category tree, OLX-style: each top-level category has a fixed
+// set of subcategories. Listings are tagged to the most specific (leaf)
+// category that applies; the listings API treats selecting a parent as
+// "this category or any of its children" (see listings.js).
+const categoryTree = [
+  {
+    slug: 'electronics', name: 'Electronics', nameUz: 'Elektronika',
+    children: [
+      { slug: 'phones', name: 'Phones', nameUz: 'Telefonlar' },
+      { slug: 'computers', name: 'Computers', nameUz: 'Kompyuterlar' },
+      { slug: 'photo-video', name: 'Photo & Video', nameUz: 'Foto/video' },
+      { slug: 'tv-video', name: 'TV & Video', nameUz: 'TV/videotexnika' },
+      { slug: 'audio', name: 'Audio', nameUz: 'Audiotexnika' },
+    ],
+  },
+  {
+    slug: 'vehicles', name: 'Vehicles', nameUz: 'Transport',
+    children: [
+      { slug: 'cars', name: 'Cars', nameUz: 'Yengil avtomobillar' },
+      { slug: 'motorcycles', name: 'Motorcycles', nameUz: 'Mototsikllar' },
+      { slug: 'trucks', name: 'Trucks', nameUz: 'Yuk mashinalari' },
+      { slug: 'auto-parts', name: 'Auto parts', nameUz: 'Avto ehtiyot qismlari' },
+    ],
+  },
+  {
+    slug: 'real-estate', name: 'Real Estate', nameUz: "Ko'chmas mulk",
+    children: [
+      { slug: 'apartments', name: 'Apartments', nameUz: 'Kvartiralar' },
+      { slug: 'houses', name: 'Houses', nameUz: 'Uylar' },
+      { slug: 'land', name: 'Land', nameUz: 'Yer uchastkalari' },
+      { slug: 'commercial', name: 'Commercial', nameUz: 'Ofis va tijorat' },
+    ],
+  },
+  {
+    slug: 'home-garden', name: 'Home & Garden', nameUz: "Uy va bog'",
+    children: [
+      { slug: 'furniture', name: 'Furniture', nameUz: 'Mebel' },
+      { slug: 'kitchenware', name: 'Kitchenware', nameUz: 'Oshxona buyumlari' },
+      { slug: 'garden', name: 'Garden', nameUz: "Bog' va hovli" },
+      { slug: 'decor', name: 'Decor', nameUz: 'Interyer dekor' },
+    ],
+  },
+  {
+    slug: 'fashion', name: 'Fashion', nameUz: 'Kiyim-kechak',
+    children: [
+      { slug: 'womenswear', name: "Women's wear", nameUz: 'Ayollar kiyimi' },
+      { slug: 'menswear', name: "Men's wear", nameUz: 'Erkaklar kiyimi' },
+      { slug: 'shoes', name: 'Shoes', nameUz: 'Poyabzal' },
+      { slug: 'accessories', name: 'Accessories', nameUz: 'Aksessuarlar' },
+    ],
+  },
+  {
+    slug: 'jobs', name: 'Jobs', nameUz: "Ish o'rinlari",
+    children: [
+      { slug: 'it-jobs', name: 'IT jobs', nameUz: 'IT va dasturlash' },
+      { slug: 'driver-jobs', name: 'Driver jobs', nameUz: 'Haydovchilar' },
+      { slug: 'sales-jobs', name: 'Sales jobs', nameUz: 'Sotuv va xizmat' },
+      { slug: 'construction-jobs', name: 'Construction jobs', nameUz: 'Qurilish' },
+    ],
+  },
+  {
+    slug: 'services', name: 'Services', nameUz: 'Xizmatlar',
+    children: [
+      { slug: 'repair-services', name: 'Repair', nameUz: "Ta'mirlash" },
+      { slug: 'beauty-services', name: 'Beauty', nameUz: "Go'zallik" },
+      { slug: 'education-services', name: 'Education', nameUz: "Ta'lim" },
+      { slug: 'transport-services', name: 'Transport services', nameUz: 'Tashish xizmatlari' },
+    ],
+  },
+  {
+    slug: 'kids', name: 'Kids', nameUz: 'Bolalar uchun',
+    children: [
+      { slug: 'toys', name: 'Toys', nameUz: "O'yinchoqlar" },
+      { slug: 'kids-clothing', name: 'Kids clothing', nameUz: 'Bolalar kiyimi' },
+      { slug: 'strollers', name: 'Strollers', nameUz: 'Aravachalar' },
+      { slug: 'bicycles', name: 'Bicycles', nameUz: 'Velosipedlar' },
+      { slug: 'school-supplies', name: 'School supplies', nameUz: 'Maktab buyumlari' },
+    ],
+  },
 ];
 
 // Picsum is a fast, reliable CDN of stock photography — deterministic per
@@ -46,7 +116,7 @@ const listings = [
     description: 'Yangi holatda, kafolat bilan. Toshkentda yetkazib berish mavjud.',
     price: 9500000,
     city: 'Tashkent',
-    category: 'electronics',
+    category: 'phones',
     seller: 'demo',
     image: photo('iphone'),
   },
@@ -55,7 +125,7 @@ const listings = [
     description: "Ishlatilmagan, quti va aksessuarlari to'liq. Rasmiy do'kondan sotib olingan.",
     price: 13000000,
     city: 'Tashkent',
-    category: 'electronics',
+    category: 'phones',
     seller: 'aziz',
     image: photo('smartphone'),
   },
@@ -64,7 +134,7 @@ const listings = [
     description: "8GB/256GB, deyarli yangi, oz ishlatilgan. Dasturchilar uchun ideal.",
     price: 15500000,
     city: 'Samarkand',
-    category: 'electronics',
+    category: 'computers',
     seller: 'aziz',
     image: photo('macbook'),
   },
@@ -74,7 +144,7 @@ const listings = [
     description: 'Yaxshi holatda, 45 000 km yurgan, bir egasidan.',
     price: 130000000,
     city: 'Samarkand',
-    category: 'vehicles',
+    category: 'cars',
     seller: 'demo',
     image: photo('sedan-car'),
   },
@@ -83,7 +153,7 @@ const listings = [
     description: "To'liq texnik ko'rikdan o'tgan, gaz uskunasi o'rnatilgan.",
     price: 95000000,
     city: 'Fergana',
-    category: 'vehicles',
+    category: 'cars',
     seller: 'demo',
     image: photo('hatchback-car'),
   },
@@ -92,7 +162,7 @@ const listings = [
     description: '2022 yil, 8000 km yurgan, texnik holati a\'lo.',
     price: 18000000,
     city: 'Andijan',
-    category: 'vehicles',
+    category: 'motorcycles',
     seller: 'aziz',
     image: photo('motorcycle'),
   },
@@ -102,7 +172,7 @@ const listings = [
     description: "80 m², 5/9 qavat, yevroremont, mebel bilan. Metro yaqin.",
     price: 850000000,
     city: 'Tashkent',
-    category: 'real-estate',
+    category: 'apartments',
     seller: 'demo',
     image: photo('apartment-interior'),
   },
@@ -111,7 +181,7 @@ const listings = [
     description: "Yangi qurilgan, 2 qavatli, barcha kommunikatsiyalar mavjud.",
     price: 620000000,
     city: 'Samarkand',
-    category: 'real-estate',
+    category: 'houses',
     seller: 'aziz',
     image: photo('house-exterior'),
   },
@@ -121,7 +191,7 @@ const listings = [
     description: "Yumshoq mebel, yuvilishi oson mato, ochiladigan mexanizm bilan.",
     price: 4200000,
     city: 'Bukhara',
-    category: 'home-garden',
+    category: 'furniture',
     seller: 'demo',
     image: photo('sofa'),
   },
@@ -130,7 +200,7 @@ const listings = [
     description: "Buyurtma asosida tayyorlangan, o'lchamlar moslashtiriladi.",
     price: 7800000,
     city: 'Namangan',
-    category: 'home-garden',
+    category: 'kitchenware',
     seller: 'aziz',
     image: photo('kitchen-cabinet'),
   },
@@ -140,7 +210,7 @@ const listings = [
     description: "48-50 razmer, faqat bir marta kiyilgan, quti bilan.",
     price: 950000,
     city: 'Tashkent',
-    category: 'fashion',
+    category: 'menswear',
     seller: 'demo',
     image: photo('mens-suit'),
   },
@@ -149,7 +219,7 @@ const listings = [
     description: "Puxlik ichlik, -20°C gacha issiq saqlaydi.",
     price: 620000,
     city: 'Fergana',
-    category: 'fashion',
+    category: 'womenswear',
     seller: 'aziz',
     image: photo('winter-jacket'),
   },
@@ -159,7 +229,7 @@ const listings = [
     description: "To'liq stavka, ofisda ishlash, tajriba 1 yildan boshlab.",
     price: 8000000,
     city: 'Tashkent',
-    category: 'jobs',
+    category: 'it-jobs',
     seller: 'demo',
     image: photo('office-work'),
   },
@@ -168,7 +238,7 @@ const listings = [
     description: "Yetkazib berish xizmati uchun, ish grafigi kelishiladi.",
     price: 4500000,
     city: 'Nukus',
-    category: 'jobs',
+    category: 'driver-jobs',
     seller: 'aziz',
     image: photo('delivery-driver'),
   },
@@ -178,7 +248,7 @@ const listings = [
     description: "Boshlang'ich narx, aniq smeta ob'ektni ko'rgandan keyin beriladi.",
     price: 5000000,
     city: 'Tashkent',
-    category: 'services',
+    category: 'repair-services',
     seller: 'demo',
     image: photo('home-renovation'),
   },
@@ -187,7 +257,7 @@ const listings = [
     description: "Diagnostika bepul, chiqib borish xizmati mavjud.",
     price: 150000,
     city: 'Bukhara',
-    category: 'services',
+    category: 'repair-services',
     seller: 'aziz',
     image: photo('computer-repair'),
   },
@@ -197,7 +267,7 @@ const listings = [
     description: "4-7 yosh oralig'i uchun, yordamchi g'ildiraklar bilan.",
     price: 890000,
     city: 'Andijan',
-    category: 'kids',
+    category: 'bicycles',
     seller: 'demo',
     image: photo('kids-bicycle'),
   },
@@ -206,19 +276,26 @@ const listings = [
     description: "Rivojlantiruvchi o'yinchoqlar, xavfsiz material.",
     price: 320000,
     city: 'Namangan',
-    category: 'kids',
+    category: 'toys',
     seller: 'aziz',
     image: photo('kids-toys'),
   },
 ];
 
 async function main() {
-  for (const c of categories) {
-    await prisma.category.upsert({
-      where: { slug: c.slug },
-      update: {},
-      create: c,
+  for (const top of categoryTree) {
+    const parent = await prisma.category.upsert({
+      where: { slug: top.slug },
+      update: { parentId: null },
+      create: { name: top.name, nameUz: top.nameUz, slug: top.slug },
     });
+    for (const child of top.children) {
+      await prisma.category.upsert({
+        where: { slug: child.slug },
+        update: { parentId: parent.id },
+        create: { name: child.name, nameUz: child.nameUz, slug: child.slug, parentId: parent.id },
+      });
+    }
   }
 
   const password = await bcrypt.hash('password123', 10);
@@ -231,16 +308,21 @@ async function main() {
     });
   }
 
-  const categoryBySlug = {};
-  for (const c of categories) {
-    categoryBySlug[c.slug] = await prisma.category.findUnique({ where: { slug: c.slug } });
-  }
+  const allCategories = await prisma.category.findMany();
+  const categoryBySlug = Object.fromEntries(allCategories.map((c) => [c.slug, c]));
 
-  // Idempotent by title, so re-running the seed only fills in what's missing
-  // instead of duplicating listings every time.
+  // Idempotent by title: re-running the seed fills in missing listings and
+  // corrects any existing listing's category (e.g. after the subcategory
+  // split) without duplicating rows.
   for (const l of listings) {
     const existing = await prisma.listing.findFirst({ where: { title: l.title } });
-    if (existing) continue;
+    const categoryId = categoryBySlug[l.category].id;
+    if (existing) {
+      if (existing.categoryId !== categoryId) {
+        await prisma.listing.update({ where: { id: existing.id }, data: { categoryId } });
+      }
+      continue;
+    }
     await prisma.listing.create({
       data: {
         title: l.title,
@@ -248,7 +330,7 @@ async function main() {
         price: l.price,
         currency: 'UZS',
         city: l.city,
-        categoryId: categoryBySlug[l.category].id,
+        categoryId,
         sellerId: sellerByKey[l.seller].id,
         imageUrl: l.image,
       },

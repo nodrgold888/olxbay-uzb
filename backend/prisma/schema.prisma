@@ -18,14 +18,21 @@ model User {
   listings      Listing[]
   ordersBought  Order[]   @relation("BuyerOrders")
   ordersSold    Order[]   @relation("SellerOrders")
+  conversationsAsBuyer  Conversation[] @relation("ConversationBuyer")
+  conversationsAsSeller Conversation[] @relation("ConversationSeller")
+  messages              Message[]
 }
 
 model Category {
-  id       Int       @id @default(autoincrement())
-  name     String    @unique
+  id       Int        @id @default(autoincrement())
+  name     String     @unique
   nameUz   String
-  slug     String    @unique
+  slug     String     @unique
   listings Listing[]
+
+  parent     Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
+  parentId   Int?
+  children   Category[] @relation("CategoryChildren")
 }
 
 model Listing {
@@ -45,6 +52,7 @@ model Listing {
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId Int
   orders     Order[]
+  conversations Conversation[]
 }
 
 // Escrow flow: PENDING_PAYMENT -> PAID_ESCROW -> SHIPPED -> RELEASED
@@ -67,4 +75,34 @@ model Order {
   buyerId    Int
   seller     User    @relation("SellerOrders", fields: [sellerId], references: [id])
   sellerId   Int
+}
+
+// A DM thread scoped to one listing between its seller and one prospective
+// buyer — a buyer can message a seller directly from a listing page, before
+// any purchase happens (not tied to an Order).
+model Conversation {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  listing   Listing @relation(fields: [listingId], references: [id])
+  listingId Int
+  buyer     User    @relation("ConversationBuyer", fields: [buyerId], references: [id])
+  buyerId   Int
+  seller    User    @relation("ConversationSeller", fields: [sellerId], references: [id])
+  sellerId  Int
+
+  messages  Message[]
+
+  @@unique([listingId, buyerId, sellerId])
+}
+
+model Message {
+  id             Int      @id @default(autoincrement())
+  body           String
+  createdAt      DateTime @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId Int
+  sender         User         @relation(fields: [senderId], references: [id])
+  senderId       Int
 }

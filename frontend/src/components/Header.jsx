@@ -19,6 +19,7 @@ export default function Header() {
             <Link to="/my-listings">Mening e'lonlarim</Link>
             <Link to="/purchases">Xaridlarim</Link>
             <Link to="/sales">Sotuvlarim</Link>
+            <Link to="/chat">Xabarlar</Link>
             <span className="user-name">{user.name}</span>
             <button
               className="link-btn"

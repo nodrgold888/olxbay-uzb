@@ -7,6 +7,7 @@ const authRoutes = require('./routes/auth');
 const listingRoutes = require('./routes/listings');
 const categoryRoutes = require('./routes/categories');
 const orderRoutes = require('./routes/orders');
+const conversationRoutes = require('./routes/conversations');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/listings', listingRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/conversations', conversationRoutes);
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 

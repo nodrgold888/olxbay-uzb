@@ -21,10 +21,11 @@ function formatPrice(price, currency) {
   return `${Number(price).toLocaleString('ru-RU')} ${currency}`;
 }
 
-export default function ListingCard({ listing }) {
+export default function ListingCard({ listing, onQuickView }) {
   const [imageFailed, setImageFailed] = useState(false);
   const thumbClass = `thumb-${listing.id % 6}`;
-  const emoji = CATEGORY_EMOJI[listing.category?.slug] || '📦';
+  const emoji =
+    CATEGORY_EMOJI[listing.category?.slug] || CATEGORY_EMOJI[listing.category?.parent?.slug] || '📦';
   const badge = STATUS_BADGE[listing.status];
   const showImage = listing.imageUrl && !imageFailed;
 
@@ -32,6 +33,20 @@ export default function ListingCard({ listing }) {
     <Link to={`/listing/${listing.id}`} className="listing-card">
       <div className={`listing-image ${showImage ? '' : thumbClass}`}>
         {badge && <span className="listing-badge">{badge}</span>}
+        {onQuickView && (
+          <button
+            className="quick-view-btn"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onQuickView(listing);
+            }}
+            title="Tezkor ko'rish"
+            aria-label="Tezkor ko'rish"
+          >
+            👁
+          </button>
+        )}
         {showImage ? (
           <img src={listing.imageUrl} alt={listing.title} onError={() => setImageFailed(true)} />
         ) : (
