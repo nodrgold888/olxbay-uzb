@@ -3,12 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, guestLogin } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [guestLoading, setGuestLoading] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -24,9 +25,30 @@ export default function Login() {
     }
   }
 
+  async function handleGuest() {
+    setError('');
+    setGuestLoading(true);
+    try {
+      await guestLogin();
+      navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.error || "Mehmon sifatida kirishda xatolik");
+    } finally {
+      setGuestLoading(false);
+    }
+  }
+
   return (
     <div className="page narrow">
       <h1>Kirish</h1>
+
+      <button className="btn-primary" onClick={handleGuest} disabled={guestLoading} style={{ width: '100%', marginBottom: 16 }}>
+        {guestLoading ? 'Kirilmoqda...' : "🎭 Mehmon sifatida kirish (parolsiz)"}
+      </button>
+      <p className="hint" style={{ marginBottom: 20 }}>
+        Bitta bosishda sinov hisobi yaratiladi — ro'yxatdan o'tish shart emas.
+      </p>
+
       <form className="form" onSubmit={handleSubmit}>
         {error && <div className="form-error">{error}</div>}
         <label>

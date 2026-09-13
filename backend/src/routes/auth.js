@@ -26,6 +26,30 @@ router.post('/register', async (req, res) => {
   });
 });
 
+const GUEST_CITIES = ['Tashkent', 'Samarkand', 'Bukhara', 'Andijan', 'Namangan', 'Fergana', 'Nukus'];
+
+// Creates a fresh throwaway account so someone can try the app with one
+// click instead of filling out the registration form. Each click gets its
+// own account (not a shared login) so guests don't see each other's data.
+router.post('/guest', async (req, res) => {
+  const suffix = Math.random().toString(36).slice(2, 8);
+  const password = await bcrypt.hash(Math.random().toString(36), 10);
+  const city = GUEST_CITIES[Math.floor(Math.random() * GUEST_CITIES.length)];
+  const user = await prisma.user.create({
+    data: {
+      name: `Mehmon-${suffix}`,
+      email: `guest-${suffix}@olxbay.local`,
+      password,
+      city,
+    },
+  });
+  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  res.status(201).json({
+    token,
+    user: { id: user.id, name: user.name, email: user.email, city: user.city },
+  });
+});
+
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const user = await prisma.user.findUnique({ where: { email } });
