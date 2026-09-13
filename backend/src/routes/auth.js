@@ -50,16 +50,24 @@ router.post('/guest', async (req, res) => {
   });
 });
 
+// TEST MODE: password is not actually checked, and an unknown email is
+// auto-registered on the spot — so any email + any password logs in. This
+// is only for quick local/demo testing; delete this shortcut (restore the
+// bcrypt.compare check below) before this app handles anything real.
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  const user = await prisma.user.findUnique({ where: { email } });
+  if (!email || !password) {
+    return res.status(400).json({ error: 'email and password are required' });
+  }
+
+  let user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    return res.status(401).json({ error: 'Invalid email or password' });
+    const hashed = await bcrypt.hash(password, 10);
+    user = await prisma.user.create({
+      data: { name: email.split('@')[0], email, password: hashed },
+    });
   }
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) {
-    return res.status(401).json({ error: 'Invalid email or password' });
-  }
+
   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
   res.json({
     token,
