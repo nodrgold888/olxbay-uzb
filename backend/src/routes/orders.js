@@ -172,6 +172,35 @@ router.post('/:id/confirm', auth, async (req, res) => {
   res.json(updated);
 });
 
+// DEMO ONLY: lets whichever side of the order is logged in trigger the
+// *other* side's next step, so the whole escrow flow can be tried solo
+// without juggling two accounts. A real deployment must delete this route —
+// the seller's "shipped" and the buyer's "confirmed" are supposed to be
+// actions only that party can take; this route intentionally skips that check.
+router.post('/:id/demo-advance', auth, async (req, res) => {
+  const order = await prisma.order.findUnique({ where: { id: Number(req.params.id) } });
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  if (order.buyerId !== req.userId && order.sellerId !== req.userId) {
+    return res.status(403).json({ error: 'Not your order' });
+  }
+
+  if (order.status === 'PAID_ESCROW') {
+    const updated = await prisma.order.update({
+      where: { id: order.id },
+      data: { status: 'SHIPPED', shippedAt: new Date() },
+    });
+    return res.json(updated);
+  }
+  if (order.status === 'SHIPPED') {
+    const updated = await prisma.order.update({
+      where: { id: order.id },
+      data: { status: 'RELEASED', releasedAt: new Date() },
+    });
+    return res.json(updated);
+  }
+  return res.status(400).json({ error: `Nothing to advance from status ${order.status}` });
+});
+
 // Buyer disputes instead of confirming (item never arrived, wrong item, etc.)
 router.post('/:id/dispute', auth, async (req, res) => {
   const order = await loadOrderForActor(req, res, 'buyer');

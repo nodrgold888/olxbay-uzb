@@ -124,6 +124,21 @@ export default function OrderDetail() {
         </div>
       )}
 
+      {['PAID_ESCROW', 'SHIPPED'].includes(order.status) && (
+        <div className="demo-box">
+          <p className="hint">
+            🧪 Demo rejimi — real hayotda buni faqat{' '}
+            {order.status === 'PAID_ESCROW' ? 'sotuvchi' : 'xaridor'} qila oladi. Bitta hisobda
+            butun jarayonni sinab ko'rish uchun shu tugmadan foydalaning.
+          </p>
+          <button className="link-btn" disabled={busy} onClick={() => runAction('demo-advance')}>
+            {order.status === 'PAID_ESCROW'
+              ? "Demo: sotuvchi jo'natdi deb belgilash"
+              : 'Demo: xaridor qabul qildi deb belgilash'}
+          </button>
+        </div>
+      )}
+
       {order.status === 'DISPUTED' && (
         <div className="empty-state">
           Nizo ochildi. OLXbay yordam xizmati pulni xaridorga qaytarish yoki sotuvchiga

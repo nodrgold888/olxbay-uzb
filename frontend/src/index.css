@@ -545,6 +545,17 @@ h3 {
   flex-wrap: wrap;
 }
 
+.demo-box {
+  border: 1px dashed var(--ink-soft);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+}
+
+.demo-box .hint {
+  margin: 0 0 8px;
+}
+
 .order-list {
   display: flex;
   flex-direction: column;
