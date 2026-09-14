@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
+import ProfileMenu from './ProfileMenu.jsx';
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -11,6 +12,12 @@ export default function Header() {
 
   function closeMenu() {
     setMenuOpen(false);
+  }
+
+  function handleLogout() {
+    logout();
+    closeMenu();
+    navigate('/');
   }
 
   return (
@@ -31,22 +38,45 @@ export default function Header() {
       <nav className={`nav ${menuOpen ? 'open' : ''}`} onClick={closeMenu}>
         {user ? (
           <>
-            <Link to="/post">+ E'lon joylash</Link>
-            <Link to="/my-listings">Mening e'lonlarim</Link>
-            <Link to="/purchases">Xaridlarim</Link>
-            <Link to="/sales">Sotuvlarim</Link>
-            <Link to="/chat">Xabarlar</Link>
-            <Link to="/favorites">Sevimlilar</Link>
-            <span className="user-name">{user.name}</span>
-            <button
-              className="link-btn"
-              onClick={() => {
-                logout();
-                navigate('/');
-              }}
-            >
-              Chiqish
+            {/* Mobile: flat link list inside the hamburger dropdown */}
+            <Link to="/post" className="btn-primary-small mobile-only">
+              + E'lon joylash
+            </Link>
+            <Link to="/my-listings" className="mobile-only">
+              📦 Mening e'lonlarim
+            </Link>
+            <Link to="/sales" className="mobile-only">
+              💰 Sotuvlarim
+            </Link>
+            <Link to="/purchases" className="mobile-only">
+              🛒 Xaridlarim
+            </Link>
+            <Link to="/favorites" className="mobile-only">
+              ❤️ Sevimlilar
+            </Link>
+            <Link to="/chat" className="mobile-only">
+              💬 Xabarlar
+            </Link>
+            <button className="link-btn mobile-only" onClick={handleLogout}>
+              🚪 Chiqish
             </button>
+
+            {/* Desktop: message icon + post button + profile avatar dropdown */}
+            <Link
+              to="/chat"
+              className="header-icon-link desktop-only"
+              title="Xabarlar"
+              aria-label="Xabarlar"
+              onClick={(e) => e.stopPropagation()}
+            >
+              💬
+            </Link>
+            <Link to="/post" className="btn-primary-small desktop-only" onClick={(e) => e.stopPropagation()}>
+              + E'lon joylash
+            </Link>
+            <span className="desktop-only" onClick={(e) => e.stopPropagation()}>
+              <ProfileMenu />
+            </span>
           </>
         ) : (
           <>
