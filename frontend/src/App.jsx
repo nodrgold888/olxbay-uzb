@@ -12,6 +12,8 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import ChatList from './pages/ChatList.jsx';
 import ChatThread from './pages/ChatThread.jsx';
+import Favorites from './pages/Favorites.jsx';
+import SellerProfile from './pages/SellerProfile.jsx';
 
 export default function App() {
   return (
@@ -21,6 +23,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/listing/:id" element={<ListingDetail />} />
+          <Route path="/sellers/:id" element={<SellerProfile />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route
@@ -84,6 +87,14 @@ export default function App() {
             element={
               <PrivateRoute>
                 <ChatThread />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/favorites"
+            element={
+              <PrivateRoute>
+                <Favorites />
               </PrivateRoute>
             }
           />

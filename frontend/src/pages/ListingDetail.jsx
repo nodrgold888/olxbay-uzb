@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import api from '../api';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useFavorites } from '../context/FavoritesContext.jsx';
 import { resolveImageUrl } from '../utils/media.js';
 
 const CATEGORY_EMOJI = {
@@ -19,6 +20,7 @@ export default function ListingDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { favoriteIds, toggleFavorite } = useFavorites();
   const [listing, setListing] = useState(null);
   const [error, setError] = useState('');
   const [buying, setBuying] = useState(false);
@@ -49,6 +51,11 @@ export default function ListingDetail() {
     } finally {
       setBuying(false);
     }
+  }
+
+  function handleFavoriteClick() {
+    if (!user) return navigate('/login');
+    toggleFavorite(listing.id);
   }
 
   async function handleMessageSeller() {
@@ -83,7 +90,18 @@ export default function ListingDetail() {
         )}
       </div>
       <div className="listing-detail-info">
-        <h1>{listing.title}</h1>
+        <div className="listing-detail-title-row">
+          <h1>{listing.title}</h1>
+          {!isOwner && (
+            <button
+              className={`favorite-btn-large ${favoriteIds.has(listing.id) ? 'active' : ''}`}
+              onClick={handleFavoriteClick}
+              title={favoriteIds.has(listing.id) ? "Sevimlilardan o'chirish" : "Sevimlilarga qo'shish"}
+            >
+              {favoriteIds.has(listing.id) ? '❤️' : '🤍'}
+            </button>
+          )}
+        </div>
         <div className="listing-detail-price">
           {Number(listing.price).toLocaleString('ru-RU')} {listing.currency}
         </div>
@@ -94,7 +112,8 @@ export default function ListingDetail() {
         </div>
         <p className="listing-detail-description">{listing.description}</p>
         <div className="seller-box">
-          <strong>Sotuvchi:</strong> {listing.seller?.name}
+          <strong>Sotuvchi:</strong>{' '}
+          <Link to={`/sellers/${listing.sellerId}`}>{listing.seller?.name}</Link>
         </div>
 
         {!isOwner && (

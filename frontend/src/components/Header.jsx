@@ -36,6 +36,7 @@ export default function Header() {
             <Link to="/purchases">Xaridlarim</Link>
             <Link to="/sales">Sotuvlarim</Link>
             <Link to="/chat">Xabarlar</Link>
+            <Link to="/favorites">Sevimlilar</Link>
             <span className="user-name">{user.name}</span>
             <button
               className="link-btn"

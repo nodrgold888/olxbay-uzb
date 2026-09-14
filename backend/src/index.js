@@ -8,6 +8,8 @@ const listingRoutes = require('./routes/listings');
 const categoryRoutes = require('./routes/categories');
 const orderRoutes = require('./routes/orders');
 const conversationRoutes = require('./routes/conversations');
+const favoriteRoutes = require('./routes/favorites');
+const userRoutes = require('./routes/users');
 
 const app = express();
 
@@ -20,6 +22,8 @@ app.use('/api/listings', listingRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/conversations', conversationRoutes);
+app.use('/api/favorites', favoriteRoutes);
+app.use('/api/users', userRoutes);
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 

@@ -21,6 +21,7 @@ model User {
   conversationsAsBuyer  Conversation[] @relation("ConversationBuyer")
   conversationsAsSeller Conversation[] @relation("ConversationSeller")
   messages              Message[]
+  favorites             Favorite[]
 }
 
 model Category {
@@ -53,6 +54,20 @@ model Listing {
   categoryId Int
   orders     Order[]
   conversations Conversation[]
+  favorites  Favorite[]
+}
+
+// Avito-style "save for later" — a many-to-many between users and listings.
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  listing   Listing @relation(fields: [listingId], references: [id])
+  listingId Int
+
+  @@unique([userId, listingId])
 }
 
 // Escrow flow: PENDING_PAYMENT -> PAID_ESCROW -> SHIPPED -> RELEASED
