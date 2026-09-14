@@ -8,8 +8,7 @@ import MyListings from './pages/MyListings.jsx';
 import OrderDetail from './pages/OrderDetail.jsx';
 import OrderList from './pages/OrderList.jsx';
 import Checkout from './pages/Checkout.jsx';
-import Login from './pages/Login.jsx';
-import Register from './pages/Register.jsx';
+import AuthPage from './pages/AuthPage.jsx';
 import ChatList from './pages/ChatList.jsx';
 import ChatThread from './pages/ChatThread.jsx';
 import Favorites from './pages/Favorites.jsx';
@@ -24,8 +23,8 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/listing/:id" element={<ListingDetail />} />
           <Route path="/sellers/:id" element={<SellerProfile />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/register" element={<AuthPage />} />
           <Route
             path="/post"
             element={
