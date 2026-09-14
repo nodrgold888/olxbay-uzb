@@ -86,20 +86,23 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="chips">
-        <div
-          className={`chip ${filters.categoryId === '' ? 'active' : ''}`}
-          onClick={() => updateFilter('categoryId', '')}
-        >
-          <span className="dot" /> Barchasi
-        </div>
-        {categories.map((c) => (
+      <div className="category-grid-head">
+        <h2>Kategoriyalar</h2>
+        {filters.categoryId !== '' && (
+          <button className="link-btn" onClick={() => updateFilter('categoryId', '')}>
+            Barchasini ko'rsatish
+          </button>
+        )}
+      </div>
+      <div className="category-grid">
+        {categories.map((c, i) => (
           <div
             key={c.id}
-            className={`chip ${activeTop?.id === c.id ? 'active' : ''}`}
+            className={`category-tile category-tile-${i % 8} ${activeTop?.id === c.id ? 'active' : ''}`}
             onClick={() => updateFilter('categoryId', String(c.id))}
           >
-            {CATEGORY_EMOJI[c.slug] || '📦'} {c.nameUz}
+            <span className="category-tile-icon">{CATEGORY_EMOJI[c.slug] || '📦'}</span>
+            <span className="category-tile-label">{c.nameUz}</span>
           </div>
         ))}
       </div>
