@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { resolveImageUrl } from '../utils/media.js';
 
 const CATEGORY_EMOJI = {
   electronics: '📱',
@@ -32,7 +33,7 @@ export default function QuickViewModal({ listing, onClose }) {
         </button>
         <div className={`modal-image ${listing.imageUrl ? '' : thumbClass}`}>
           {listing.imageUrl ? (
-            <img src={listing.imageUrl} alt={listing.title} />
+            <img src={resolveImageUrl(listing.imageUrl)} alt={listing.title} />
           ) : (
             <span className="listing-image-placeholder">{emoji}</span>
           )}

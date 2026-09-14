@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import api from '../api';
 import { useAuth } from '../context/AuthContext.jsx';
+import { resolveImageUrl } from '../utils/media.js';
 
 const POLL_INTERVAL_MS = 4000;
 
@@ -64,7 +65,7 @@ export default function ChatThread() {
       </button>
       <div className="chat-thread">
         <div className="chat-thread-header">
-          {conversation.listing.imageUrl && <img src={conversation.listing.imageUrl} alt="" />}
+          {conversation.listing.imageUrl && <img src={resolveImageUrl(conversation.listing.imageUrl)} alt="" />}
           <div>
             <div className="chat-list-name">{otherParty.name}</div>
             <Link to={`/listing/${conversation.listing.id}`} className="chat-list-listing">

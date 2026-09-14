@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api';
 import { useAuth } from '../context/AuthContext.jsx';
+import { resolveImageUrl } from '../utils/media.js';
 
 const CATEGORY_EMOJI = {
   electronics: '📱',
@@ -76,7 +77,7 @@ export default function ListingDetail() {
     <div className="page listing-detail">
       <div className={`listing-detail-image ${showImage ? '' : thumbClass}`}>
         {showImage ? (
-          <img src={listing.imageUrl} alt={listing.title} onError={() => setImageFailed(true)} />
+          <img src={resolveImageUrl(listing.imageUrl)} alt={listing.title} onError={() => setImageFailed(true)} />
         ) : (
           <div className="listing-image-placeholder large">{emoji}</div>
         )}

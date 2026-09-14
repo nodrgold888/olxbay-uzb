@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import { useAuth } from '../context/AuthContext.jsx';
+import { resolveImageUrl } from '../utils/media.js';
 
 export default function ChatList() {
   const { user } = useAuth();
@@ -32,7 +33,7 @@ export default function ChatList() {
             return (
               <Link key={c.id} to={`/chat/${c.id}`} className="chat-list-item">
                 <div className="chat-list-thumb">
-                  {c.listing.imageUrl ? <img src={c.listing.imageUrl} alt="" /> : '📦'}
+                  {c.listing.imageUrl ? <img src={resolveImageUrl(c.listing.imageUrl)} alt="" /> : '📦'}
                 </div>
                 <div className="chat-list-info">
                   <div className="chat-list-name">{otherParty.name}</div>

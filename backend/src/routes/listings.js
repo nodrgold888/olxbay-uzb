@@ -149,7 +149,17 @@ router.delete('/:id', auth, async (req, res) => {
   if (existing.status !== 'active') {
     return res.status(400).json({ error: 'A reserved or sold listing cannot be deleted' });
   }
-  await prisma.listing.delete({ where: { id } });
+  // Orders are intentionally protected by the status check above (a listing
+  // with any order is never 'active'), but a listing can still have chat
+  // threads (messaging happens before any purchase) — those don't need to
+  // outlive the listing, so clear them out in the same transaction.
+  const conversations = await prisma.conversation.findMany({ where: { listingId: id }, select: { id: true } });
+  const conversationIds = conversations.map((c) => c.id);
+  await prisma.$transaction([
+    prisma.message.deleteMany({ where: { conversationId: { in: conversationIds } } }),
+    prisma.conversation.deleteMany({ where: { listingId: id } }),
+    prisma.listing.delete({ where: { id } }),
+  ]);
   res.status(204).send();
 });
 

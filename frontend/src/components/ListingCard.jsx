@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { resolveImageUrl } from '../utils/media.js';
 
 const CATEGORY_EMOJI = {
   electronics: '📱',
@@ -48,7 +49,7 @@ export default function ListingCard({ listing, onQuickView }) {
           </button>
         )}
         {showImage ? (
-          <img src={listing.imageUrl} alt={listing.title} onError={() => setImageFailed(true)} />
+          <img src={resolveImageUrl(listing.imageUrl)} alt={listing.title} onError={() => setImageFailed(true)} />
         ) : (
           <span className="listing-image-placeholder">{emoji}</span>
         )}
